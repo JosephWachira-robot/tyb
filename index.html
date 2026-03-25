@@ -1,698 +1,850 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TY — Creative AI Studio</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>K2 — Website AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
-    :root {
-      --bg: #080808;
-      --surface: #111111;
-      --border: rgba(255,255,255,0.08);
-      --text: #f0f0f0;
-      --muted: rgba(240,240,240,0.45);
-      --accent: #c8ff00;
-      --accent2: #ff4d6d;
-      --mono: 'DM Mono', monospace;
-      --sans: 'Syne', sans-serif;
-    }
+:root{
+  --bg:#09090b;
+  --panel:#0f0f12;
+  --surface:#16161a;
+  --border:#1e1e24;
+  --border2:#2a2a34;
+  --text:#e8e8f0;
+  --muted:#5a5a72;
+  --muted2:#3a3a4a;
+  --accent:#00d4ff;
+  --accent-dim:rgba(0,212,255,0.12);
+  --accent-glow:rgba(0,212,255,0.25);
+  --green:#00ff88;
+  --red:#ff4466;
+  --user-bubble:#1a1a2e;
+  --k2-bubble:#0f1419;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'Outfit',sans-serif;
+  --radius:14px;
+}
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--sans);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);display:flex;flex-direction:column}
 
-    /* Grain overlay */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 9999;
-      opacity: 0.4;
-    }
+/* ── TOPBAR ── */
+.topbar{
+  height:56px;
+  background:var(--panel);
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 20px;
+  flex-shrink:0;
+  position:relative;
+  z-index:10;
+}
+.topbar-left{display:flex;align-items:center;gap:14px}
+.k2-logo{
+  display:flex;align-items:center;gap:10px;
+}
+.k2-mark{
+  width:34px;height:34px;
+  background:linear-gradient(135deg,#00d4ff,#0088cc);
+  border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:13px;letter-spacing:-0.5px;color:#000;
+  font-family:var(--mono);
+}
+.k2-name{font-weight:700;font-size:1.1rem;letter-spacing:-0.5px}
+.k2-tag{
+  font-family:var(--mono);
+  font-size:0.62rem;
+  padding:3px 9px;
+  border-radius:100px;
+  background:rgba(0,212,255,0.1);
+  border:1px solid rgba(0,212,255,0.2);
+  color:var(--accent);
+  letter-spacing:0.05em;
+}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.status{
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--mono);font-size:0.65rem;
+  color:var(--green);
+}
+.status-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.top-btn{
+  background:var(--surface);
+  border:1px solid var(--border2);
+  color:var(--muted);
+  font-family:var(--mono);font-size:0.7rem;
+  padding:6px 12px;border-radius:8px;cursor:pointer;
+  transition:all 0.15s;
+  display:flex;align-items:center;gap:6px;
+}
+.top-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+.top-btn.danger:hover{border-color:var(--red);color:var(--red);background:rgba(255,68,102,0.1)}
 
-    /* NAV */
-    nav {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      border-bottom: 1px solid var(--border);
-      background: rgba(8,8,8,0.85);
-      backdrop-filter: blur(20px);
-      padding: 0 2rem;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+/* ── MAIN SPLIT ── */
+.workspace{
+  flex:1;
+  display:flex;
+  overflow:hidden;
+}
 
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+/* ── CHAT PANEL ── */
+.chat-panel{
+  width:380px;
+  min-width:320px;
+  display:flex;
+  flex-direction:column;
+  border-right:1px solid var(--border);
+  background:var(--panel);
+  flex-shrink:0;
+}
 
-    .logo-mark {
-      width: 36px;
-      height: 36px;
-      background: var(--accent);
-      color: #000;
-      font-weight: 800;
-      font-size: 14px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      letter-spacing: -1px;
-    }
+.chat-history{
+  flex:1;
+  overflow-y:auto;
+  padding:20px 16px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  scroll-behavior:smooth;
+}
+.chat-history::-webkit-scrollbar{width:4px}
+.chat-history::-webkit-scrollbar-track{background:transparent}
+.chat-history::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
 
-    .logo-text {
-      font-size: 1.4rem;
-      font-weight: 800;
-      letter-spacing: -1px;
-    }
+/* messages */
+.msg{display:flex;flex-direction:column;gap:5px;animation:msgIn 0.25s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{align-items:flex-end}
+.msg.k2{align-items:flex-start}
 
-    .nav-tabs {
-      display: flex;
-      gap: 4px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 4px;
-    }
+.msg-sender{
+  font-family:var(--mono);font-size:0.6rem;
+  color:var(--muted);letter-spacing:0.08em;
+  text-transform:uppercase;
+  padding:0 4px;
+}
+.msg.k2 .msg-sender{color:var(--accent)}
 
-    .tab-btn {
-      background: none;
-      border: none;
-      color: var(--muted);
-      font-family: var(--sans);
-      font-size: 0.8rem;
-      font-weight: 600;
-      padding: 7px 16px;
-      border-radius: 7px;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      letter-spacing: 0.02em;
-    }
+.msg-bubble{
+  max-width:92%;
+  padding:12px 15px;
+  border-radius:var(--radius);
+  font-size:0.875rem;
+  line-height:1.6;
+}
+.msg.user .msg-bubble{
+  background:var(--user-bubble);
+  border:1px solid var(--border2);
+  border-bottom-right-radius:4px;
+  color:var(--text);
+}
+.msg.k2 .msg-bubble{
+  background:var(--k2-bubble);
+  border:1px solid var(--border);
+  border-bottom-left-radius:4px;
+  color:var(--text);
+}
 
-    .tab-btn.active {
-      background: var(--accent);
-      color: #000;
-    }
+.msg-bubble code{
+  font-family:var(--mono);
+  font-size:0.78rem;
+  background:rgba(0,212,255,0.08);
+  border:1px solid rgba(0,212,255,0.15);
+  border-radius:5px;
+  padding:1px 6px;
+  color:var(--accent);
+}
 
-    .tab-btn:not(.active):hover { background: rgba(255,255,255,0.06); color: var(--text); }
+/* typing indicator */
+.typing-indicator{
+  display:flex;align-items:center;gap:4px;
+  padding:14px 16px;
+}
+.typing-dot{
+  width:7px;height:7px;
+  background:var(--muted);
+  border-radius:50%;
+  animation:typingBounce 1.2s infinite;
+}
+.typing-dot:nth-child(2){animation-delay:0.2s}
+.typing-dot:nth-child(3){animation-delay:0.4s}
+@keyframes typingBounce{
+  0%,60%,100%{transform:translateY(0);background:var(--muted2)}
+  30%{transform:translateY(-8px);background:var(--accent)}
+}
 
-    .status-pill {
-      font-family: var(--mono);
-      font-size: 0.68rem;
-      padding: 5px 12px;
-      border-radius: 100px;
-      background: rgba(200, 255, 0, 0.08);
-      border: 1px solid rgba(200,255,0,0.2);
-      color: var(--accent);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
+/* quick prompts */
+.quick-section{
+  padding:12px 16px 0;
+  flex-shrink:0;
+}
+.quick-label{
+  font-family:var(--mono);font-size:0.6rem;
+  color:var(--muted);letter-spacing:0.1em;
+  text-transform:uppercase;margin-bottom:8px;
+}
+.quick-chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{
+  background:none;
+  border:1px solid var(--border2);
+  color:var(--muted);
+  font-family:var(--mono);font-size:0.65rem;
+  padding:5px 11px;border-radius:100px;
+  cursor:pointer;transition:all 0.15s;
+  white-space:nowrap;
+}
+.chip:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
 
-    .status-dot {
-      width: 6px;
-      height: 6px;
-      background: var(--accent);
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
+/* input row */
+.chat-input-wrap{
+  padding:14px 16px;
+  border-top:1px solid var(--border);
+  flex-shrink:0;
+}
+.input-row{
+  display:flex;
+  gap:8px;
+  background:var(--surface);
+  border:1px solid var(--border2);
+  border-radius:var(--radius);
+  padding:6px 6px 6px 14px;
+  transition:border-color 0.2s;
+}
+.input-row:focus-within{border-color:rgba(0,212,255,0.4)}
+.chat-input{
+  flex:1;
+  background:none;
+  border:none;outline:none;
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:0.875rem;
+  resize:none;
+  max-height:120px;
+  overflow-y:auto;
+  line-height:1.5;
+  padding:6px 0;
+}
+.chat-input::placeholder{color:var(--muted)}
+.chat-input::-webkit-scrollbar{width:3px}
+.chat-input::-webkit-scrollbar-thumb{background:var(--border2)}
+.send-btn{
+  background:var(--accent);
+  color:#000;
+  border:none;
+  border-radius:9px;
+  width:38px;height:38px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  transition:all 0.15s;
+  flex-shrink:0;
+  align-self:flex-end;
+}
+.send-btn:hover{background:#22e0ff;transform:scale(1.05)}
+.send-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+.send-btn svg{width:16px;height:16px}
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
+/* ── PREVIEW PANEL ── */
+.preview-panel{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  background:var(--bg);
+  overflow:hidden;
+}
 
-    /* HERO */
-    .hero {
-      text-align: center;
-      padding: 5rem 2rem 3rem;
-    }
+.preview-topbar{
+  height:46px;
+  background:var(--panel);
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 16px;
+  flex-shrink:0;
+}
+.preview-url{
+  display:flex;align-items:center;gap:10px;
+  flex:1;max-width:500px;
+}
+.url-dots{display:flex;gap:5px}
+.url-dot{width:10px;height:10px;border-radius:50%;background:var(--border2)}
+.url-dot:nth-child(1){background:#ff5f57}
+.url-dot:nth-child(2){background:#febc2e}
+.url-dot:nth-child(3){background:#28c840}
+.url-bar{
+  flex:1;
+  background:var(--surface);
+  border:1px solid var(--border2);
+  border-radius:7px;
+  padding:5px 12px;
+  font-family:var(--mono);font-size:0.68rem;
+  color:var(--muted);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.preview-actions{display:flex;gap:8px}
+.prev-btn{
+  background:var(--surface);
+  border:1px solid var(--border2);
+  color:var(--muted);
+  font-family:var(--mono);font-size:0.65rem;
+  padding:5px 12px;border-radius:7px;
+  cursor:pointer;transition:all 0.15s;
+  display:flex;align-items:center;gap:5px;
+}
+.prev-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
 
-    .hero-label {
-      font-family: var(--mono);
-      font-size: 0.72rem;
-      color: var(--accent);
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      margin-bottom: 1.2rem;
-    }
+.preview-body{
+  flex:1;
+  position:relative;
+  background:#fff;
+  overflow:hidden;
+}
 
-    .hero-title {
-      font-size: clamp(3rem, 8vw, 6rem);
-      font-weight: 800;
-      letter-spacing: -3px;
-      line-height: 0.95;
-      margin-bottom: 1rem;
-    }
+#web-iframe{
+  width:100%;height:100%;
+  border:none;
+  display:block;
+}
 
-    .hero-title span {
-      color: var(--accent);
-    }
+.preview-placeholder{
+  position:absolute;inset:0;
+  background:var(--bg);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:18px;
+  pointer-events:none;
+}
+.placeholder-icon{
+  width:72px;height:72px;
+  border:1px solid var(--border2);
+  border-radius:20px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:2rem;
+}
+.placeholder-text{
+  text-align:center;
+}
+.placeholder-text h3{font-size:1.1rem;font-weight:600;margin-bottom:6px}
+.placeholder-text p{font-family:var(--mono);font-size:0.72rem;color:var(--muted)}
 
-    .hero-sub {
-      font-size: 1rem;
-      color: var(--muted);
-      font-family: var(--mono);
-      max-width: 400px;
-      margin: 0 auto;
-      line-height: 1.6;
-    }
+.generating-overlay{
+  position:absolute;inset:0;
+  background:rgba(9,9,11,0.85);
+  backdrop-filter:blur(4px);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:16px;
+  z-index:5;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.3s;
+}
+.generating-overlay.active{opacity:1;pointer-events:all}
+.gen-spinner{
+  width:44px;height:44px;
+  border:2px solid var(--border2);
+  border-top-color:var(--accent);
+  border-radius:50%;
+  animation:spin 0.7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.gen-label{font-family:var(--mono);font-size:0.8rem;color:var(--accent)}
+.gen-sub{font-family:var(--mono);font-size:0.68rem;color:var(--muted);max-width:240px;text-align:center;line-height:1.5}
 
-    /* INPUT AREA */
-    .input-wrap {
-      max-width: 760px;
-      margin: 2.5rem auto 0;
-      padding: 0 1.5rem;
-    }
+/* code viewer drawer */
+.code-drawer{
+  position:absolute;bottom:0;left:0;right:0;
+  height:0;
+  background:var(--panel);
+  border-top:1px solid var(--border);
+  transition:height 0.3s ease;
+  overflow:hidden;
+  z-index:4;
+}
+.code-drawer.open{height:280px}
+.code-drawer-header{
+  padding:10px 16px;
+  border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;
+  font-family:var(--mono);font-size:0.7rem;color:var(--muted);
+}
+.code-drawer-header span{color:var(--text)}
+.code-scroll{
+  height:calc(100% - 42px);
+  overflow:auto;
+  padding:16px;
+}
+.code-scroll::-webkit-scrollbar{width:4px;height:4px}
+.code-scroll::-webkit-scrollbar-thumb{background:var(--border2)}
+pre{
+  font-family:var(--mono);font-size:0.72rem;
+  color:#7ec8e3;line-height:1.7;
+  white-space:pre-wrap;word-break:break-all;
+}
 
-    .input-box {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 6px 6px 6px 20px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      transition: border-color 0.2s;
-    }
+/* welcome banner in chat */
+.welcome-banner{
+  background:linear-gradient(135deg,rgba(0,212,255,0.06),rgba(0,136,204,0.04));
+  border:1px solid rgba(0,212,255,0.15);
+  border-radius:var(--radius);
+  padding:18px;
+  margin-bottom:4px;
+}
+.welcome-banner h2{
+  font-size:1rem;font-weight:700;
+  margin-bottom:6px;
+  letter-spacing:-0.3px;
+}
+.welcome-banner p{
+  font-size:0.8rem;color:var(--muted);line-height:1.6;
+  font-family:var(--mono);
+}
+.caps-list{
+  margin-top:12px;
+  display:flex;flex-wrap:wrap;gap:6px;
+}
+.cap{
+  font-family:var(--mono);font-size:0.62rem;
+  padding:4px 10px;border-radius:100px;
+  background:rgba(0,212,255,0.08);
+  border:1px solid rgba(0,212,255,0.15);
+  color:var(--accent);
+}
 
-    .input-box:focus-within {
-      border-color: rgba(200,255,0,0.4);
-    }
-
-    .input-box input {
-      flex: 1;
-      background: none;
-      border: none;
-      outline: none;
-      color: var(--text);
-      font-family: var(--mono);
-      font-size: 0.9rem;
-      padding: 10px 0;
-    }
-
-    .input-box input::placeholder { color: var(--muted); }
-
-    .send-btn {
-      background: var(--accent);
-      color: #000;
-      border: none;
-      border-radius: 10px;
-      padding: 12px 22px;
-      font-family: var(--sans);
-      font-size: 0.82rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.2s;
-      letter-spacing: 0.03em;
-      white-space: nowrap;
-    }
-
-    .send-btn:hover { background: #d4ff1a; transform: scale(1.02); }
-    .send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-    .hint { text-align: center; font-family: var(--mono); font-size: 0.7rem; color: var(--muted); margin-top: 10px; }
-
-    /* QUICK PROMPTS */
-    .quick-prompts {
-      max-width: 760px;
-      margin: 2rem auto 0;
-      padding: 0 1.5rem;
-    }
-
-    .quick-label {
-      font-family: var(--mono);
-      font-size: 0.68rem;
-      color: var(--muted);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
-
-    .chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .chip {
-      background: none;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      font-family: var(--mono);
-      font-size: 0.72rem;
-      padding: 7px 14px;
-      border-radius: 100px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .chip:hover { border-color: var(--accent); color: var(--accent); background: rgba(200,255,0,0.05); }
-
-    /* OUTPUT AREA */
-    .output-area {
-      max-width: 900px;
-      margin: 3rem auto;
-      padding: 0 1.5rem;
-    }
-
-    .output-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-
-    .output-title {
-      font-size: 0.85rem;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    .output-actions { display: flex; gap: 10px; }
-
-    .action-btn {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      font-family: var(--mono);
-      font-size: 0.72rem;
-      padding: 6px 14px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .action-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-    .preview-frame {
-      width: 100%;
-      height: 520px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: #fff;
-      overflow: hidden;
-    }
-
-    /* VIDEO OUTPUT */
-    .video-frame {
-      width: 100%;
-      aspect-ratio: 16/9;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      overflow: hidden;
-      background: #0a0a0a;
-      position: relative;
-    }
-
-    .video-frame video { width: 100%; height: 100%; object-fit: cover; }
-
-    .video-badge {
-      position: absolute;
-      bottom: 12px;
-      left: 12px;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--border);
-      font-family: var(--mono);
-      font-size: 0.68rem;
-      padding: 5px 12px;
-      border-radius: 100px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: var(--accent);
-    }
-
-    .video-demo-notice {
-      margin-top: 12px;
-      padding: 12px 16px;
-      background: rgba(255, 77, 109, 0.08);
-      border: 1px solid rgba(255, 77, 109, 0.2);
-      border-radius: 10px;
-      font-family: var(--mono);
-      font-size: 0.75rem;
-      color: #ff4d6d;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    /* LOADING */
-    .loading-state {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 2rem;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-    }
-
-    .loading-spinner {
-      width: 36px;
-      height: 36px;
-      border: 2px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      flex-shrink: 0;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .loading-text { font-family: var(--mono); font-size: 0.85rem; }
-    .loading-text small { display: block; color: var(--muted); font-size: 0.72rem; margin-top: 4px; }
-
-    /* CODE PANEL */
-    .code-panel {
-      margin-top: 12px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-    }
-
-    .code-header {
-      padding: 10px 16px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-family: var(--mono);
-      font-size: 0.72rem;
-      color: var(--muted);
-    }
-
-    .code-body {
-      padding: 16px;
-      font-family: var(--mono);
-      font-size: 0.75rem;
-      color: #a8e6cf;
-      max-height: 200px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      word-break: break-all;
-      line-height: 1.6;
-      display: none;
-    }
-
-    .hidden { display: none !important; }
-  </style>
+@media(max-width:768px){
+  .chat-panel{width:100%;border-right:none}
+  .preview-panel{display:none}
+  .workspace{flex-direction:column}
+}
+</style>
 </head>
 <body>
 
-  <nav>
-    <div class="logo">
-      <div class="logo-mark">TY</div>
-      <div class="logo-text">TY Studio</div>
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="k2-logo">
+      <div class="k2-mark">K2</div>
+      <div class="k2-name">K2</div>
     </div>
-    <div class="nav-tabs">
-      <button class="tab-btn active" id="btn-video" onclick="switchMode(0)">
-        <i class="fas fa-film"></i> Video Studio
-      </button>
-      <button class="tab-btn" id="btn-web" onclick="switchMode(1)">
-        <i class="fas fa-code"></i> Web Studio
-      </button>
-    </div>
-    <div class="status-pill">
+    <span class="k2-tag">WEBSITE AI</span>
+  </div>
+  <div class="topbar-right">
+    <div class="status">
       <div class="status-dot"></div>
-      AI LIVE
+      ONLINE
     </div>
-  </nav>
-
-  <div class="hero">
-    <div class="hero-label" id="mode-label">// Video Generation</div>
-    <h1 class="hero-title" id="mode-title">Video<br><span>Studio</span></h1>
-    <p class="hero-sub" id="mode-sub">Turn any idea into cinematic video. Powered by AI.</p>
+    <button class="top-btn" id="toggle-code-btn" onclick="toggleCodeDrawer()" style="display:none">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      Code
+    </button>
+    <button class="top-btn" id="copy-btn" onclick="copyCode()" style="display:none">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+      Copy
+    </button>
+    <button class="top-btn" id="download-btn" onclick="downloadHTML()" style="display:none">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download
+    </button>
+    <button class="top-btn danger" onclick="clearChat()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+      Clear
+    </button>
   </div>
+</div>
 
-  <div class="input-wrap">
-    <div class="input-box">
-      <input type="text" id="prompt" placeholder="Describe what you want to create..." autocomplete="off">
-      <button class="send-btn" id="send-btn" onclick="generate()">
-        <i class="fas fa-arrow-right"></i> Generate
-      </button>
-    </div>
-    <p class="hint">↵ Enter to send &nbsp;·&nbsp; Real AI generation in Web Studio</p>
-  </div>
+<!-- WORKSPACE -->
+<div class="workspace">
 
-  <div class="quick-prompts">
-    <p class="quick-label">Try these →</p>
-    <div class="chips" id="chips-container"></div>
-  </div>
-
-  <!-- OUTPUT -->
-  <div class="output-area" id="output-area" style="display:none">
-    <div class="output-header">
-      <span class="output-title" id="output-label">Generated Website</span>
-      <div class="output-actions">
-        <button class="action-btn" id="copy-btn" onclick="copyCode()" style="display:none">
-          <i class="fas fa-copy"></i> Copy Code
-        </button>
-        <button class="action-btn" id="toggle-code-btn" onclick="toggleCode()" style="display:none">
-          <i class="fas fa-code"></i> View Code
-        </button>
-        <button class="action-btn" onclick="regenerate()">
-          <i class="fas fa-redo"></i> Redo
-        </button>
-      </div>
-    </div>
-
-    <!-- Loading -->
-    <div class="loading-state hidden" id="loading">
-      <div class="loading-spinner"></div>
-      <div class="loading-text">
-        Generating with Claude AI...
-        <small id="loading-sub">Building your website from scratch</small>
-      </div>
-    </div>
-
-    <!-- Web preview -->
-    <div id="web-result" class="hidden">
-      <iframe id="web-preview" class="preview-frame" sandbox="allow-scripts allow-same-origin"></iframe>
-      <div class="code-panel" id="code-panel">
-        <div class="code-header">
-          <span>generated-website.html</span>
-          <span id="code-size"></span>
-        </div>
-        <pre class="code-body" id="code-display"></pre>
-      </div>
-    </div>
-
-    <!-- Video output -->
-    <div id="video-result" class="hidden">
-      <div class="video-frame">
-        <video controls poster="https://picsum.photos/id/1015/1920/1080">
-          <source src="https://test-streams.mux.dev/x264_480p.mp4" type="video/mp4">
-        </video>
-        <div class="video-badge">
-          <i class="fas fa-circle" style="color:var(--accent2); font-size:0.5rem"></i>
-          DEMO · 4K · 8s
+  <!-- CHAT PANEL -->
+  <div class="chat-panel">
+    <div class="chat-history" id="chat-history">
+      <div class="welcome-banner">
+        <h2>👋 I'm K2 — your website AI</h2>
+        <p>Describe anything. I'll build it live — landing pages, portfolios, dashboards, e-commerce, apps, components, animations, and more. Iterate freely.</p>
+        <div class="caps-list">
+          <span class="cap">Landing Pages</span>
+          <span class="cap">Portfolios</span>
+          <span class="cap">Dashboards</span>
+          <span class="cap">E-commerce</span>
+          <span class="cap">Animations</span>
+          <span class="cap">Components</span>
+          <span class="cap">Full Apps</span>
         </div>
       </div>
-      <div class="video-demo-notice">
-        <i class="fas fa-info-circle"></i>
-        Video generation is currently demo mode. Connect RunwayML or Luma AI API to enable real generation.
+    </div>
+
+    <div class="quick-section">
+      <p class="quick-label">Quick start</p>
+      <div class="quick-chips" id="chips">
+        <button class="chip" onclick="quickSend('Luxury watch brand landing page with cinematic dark theme')">⌚ Luxury watch brand</button>
+        <button class="chip" onclick="quickSend('Developer portfolio with terminal aesthetic and animated sections')">💻 Dev portfolio</button>
+        <button class="chip" onclick="quickSend('SaaS analytics dashboard with charts, stats, and sidebar nav')">📊 Analytics dashboard</button>
+        <button class="chip" onclick="quickSend('Minimal fashion e-commerce store homepage with product grid')">👗 Fashion store</button>
+        <button class="chip" onclick="quickSend('Crypto / Web3 project landing page with animated hero')">🔷 Web3 landing page</button>
+        <button class="chip" onclick="quickSend('Restaurant website with menu, gallery, and reservation form')">🍽️ Restaurant site</button>
+      </div>
+    </div>
+
+    <div class="chat-input-wrap">
+      <div class="input-row">
+        <textarea
+          id="chat-input"
+          class="chat-input"
+          placeholder="Describe a website, request changes, add features..."
+          rows="1"
+        ></textarea>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
       </div>
     </div>
   </div>
 
-  <script>
-    let currentMode = 0; // 0=video, 1=web
-    let generatedCode = '';
+  <!-- PREVIEW PANEL -->
+  <div class="preview-panel">
+    <div class="preview-topbar">
+      <div class="preview-url">
+        <div class="url-dots">
+          <div class="url-dot"></div>
+          <div class="url-dot"></div>
+          <div class="url-dot"></div>
+        </div>
+        <div class="url-bar" id="url-bar">k2://preview — waiting for generation</div>
+      </div>
+      <div class="preview-actions">
+        <button class="prev-btn" onclick="reloadPreview()">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+          Refresh
+        </button>
+      </div>
+    </div>
 
-    const videoPrompts = [
-      'Luxury watch floating in deep space',
-      'Cyberpunk city flythrough at night',
-      'Slow motion ocean wave at sunset',
-      'Abstract particle explosion in 4K',
-    ];
+    <div class="preview-body">
+      <div class="preview-placeholder" id="placeholder">
+        <div class="placeholder-icon">🏗️</div>
+        <div class="placeholder-text">
+          <h3>Live Preview</h3>
+          <p>Your website will render here<br>as K2 builds it</p>
+        </div>
+      </div>
 
-    const webPrompts = [
-      'SaaS landing page with dark theme',
-      'Fashion brand e-commerce homepage',
-      'Personal portfolio for a developer',
-      'Restaurant website with menu',
-    ];
+      <iframe id="web-iframe" style="display:none" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
 
-    function renderChips() {
-      const prompts = currentMode === 0 ? videoPrompts : webPrompts;
-      const container = document.getElementById('chips-container');
-      container.innerHTML = prompts.map(p =>
-        `<button class="chip" onclick="quickPrompt('${p.replace(/'/g, "\\'")}')">${p}</button>`
-      ).join('');
-    }
+      <div class="generating-overlay" id="gen-overlay">
+        <div class="gen-spinner"></div>
+        <div class="gen-label">K2 is building...</div>
+        <div class="gen-sub" id="gen-sub">Generating your website</div>
+      </div>
 
-    function switchMode(mode) {
-      currentMode = mode;
-      document.getElementById('btn-video').classList.toggle('active', mode === 0);
-      document.getElementById('btn-web').classList.toggle('active', mode === 1);
+      <div class="code-drawer" id="code-drawer">
+        <div class="code-drawer-header">
+          <span><span style="color:var(--accent)">generated</span>.html</span>
+          <button class="prev-btn" onclick="toggleCodeDrawer()">✕ Close</button>
+        </div>
+        <div class="code-scroll">
+          <pre id="code-pre"></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-      if (mode === 0) {
-        document.getElementById('mode-label').textContent = '// Video Generation';
-        document.getElementById('mode-title').innerHTML = 'Video<br><span>Studio</span>';
-        document.getElementById('mode-sub').textContent = 'Turn any idea into cinematic video. Powered by AI.';
-        document.getElementById('prompt').placeholder = 'Describe your video scene...';
-      } else {
-        document.getElementById('mode-label').textContent = '// Web Generation';
-        document.getElementById('mode-title').innerHTML = 'Web<br><span>Studio</span>';
-        document.getElementById('mode-sub').textContent = 'Real AI — Claude builds actual websites from your prompt.';
-        document.getElementById('prompt').placeholder = 'Describe the website you want to build...';
-      }
+<script>
+// ── STATE ──
+let conversationHistory = [];
+let currentCode = '';
+let isGenerating = false;
+let codeDrawerOpen = false;
 
-      renderChips();
-      document.getElementById('output-area').style.display = 'none';
-    }
+const K2_SYSTEM = `You are K2, the world's most advanced AI website builder. You generate complete, stunning, production-quality single-file HTML websites.
 
-    function quickPrompt(text) {
-      document.getElementById('prompt').value = text;
-      generate();
-    }
+IDENTITY:
+- You are a master of web design, UI/UX, animation, and frontend engineering
+- You build websites that would win design awards — visually distinctive, highly polished
+- You maintain context across the conversation so the user can iterate ("make it darker", "add a nav", "change the font")
 
-    async function generate() {
-      const prompt = document.getElementById('prompt').value.trim();
-      if (!prompt) return;
+OUTPUT RULES — CRITICAL:
+- ALWAYS output the COMPLETE HTML document. Never partial code, never explanations before/after the code
+- Start your response with a single line of natural language (1-2 sentences describing what you built), then output the full HTML
+- Format: [One line description]\n[FULL HTML STARTING WITH <!DOCTYPE html>]
+- The HTML must be complete and self-contained — no external dependencies except Google Fonts
 
-      const outputArea = document.getElementById('output-area');
-      outputArea.style.display = 'block';
+DESIGN STANDARDS:
+- Every website must be visually extraordinary — not generic, not template-looking
+- Choose distinctive Google Fonts that match the aesthetic (never Arial, never system fonts)
+- Use embedded CSS animations liberally — scroll reveals, hover effects, parallax, transitions
+- Create real, realistic content (no placeholder "Lorem ipsum" unless asked)
+- Responsive design — mobile-first
+- Rich visual details: gradients, shadows, textures, custom cursors, glass morphism, noise overlays, whatever fits
+- Vary your aesthetic widely — dark luxury, editorial white, brutalist, retro-futuristic, organic, etc.
 
-      // Hide results, show loading
-      document.getElementById('web-result').classList.add('hidden');
-      document.getElementById('video-result').classList.add('hidden');
-      document.getElementById('loading').classList.remove('hidden');
-      document.getElementById('send-btn').disabled = true;
-      document.getElementById('copy-btn').style.display = 'none';
-      document.getElementById('toggle-code-btn').style.display = 'none';
+CAPABILITIES (do all of these perfectly):
+- Landing pages (SaaS, product, startup, personal brand)
+- Portfolios (developer, designer, photographer, creative)
+- E-commerce (product pages, stores, category pages)
+- Dashboards (analytics, admin panels, data visualization)
+- Blogs and editorial layouts
+- Restaurant / hospitality sites
+- Agency and studio sites
+- Web3 / crypto / NFT projects
+- Interactive components and micro-animations
+- Multi-section full websites with nav, hero, features, pricing, testimonials, footer
+- Dark themes, light themes, high-contrast themes
 
-      outputArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+ITERATION:
+- When the user asks for changes, regenerate the COMPLETE updated website
+- Keep everything from the previous version and apply the requested changes
+- Never lose previous content when iterating`;
 
-      if (currentMode === 0) {
-        // Demo video
-        await new Promise(r => setTimeout(r, 1800));
-        document.getElementById('loading').classList.add('hidden');
-        document.getElementById('video-result').classList.remove('hidden');
-        document.getElementById('output-label').textContent = 'Generated Video (Demo)';
-      } else {
-        // Real Claude API — web generation
-        document.getElementById('loading-sub').textContent = `Building: "${prompt}"`;
-        document.getElementById('output-label').textContent = 'Generated Website';
+// ── CORE FUNCTIONS ──
+async function sendMessage(text) {
+  const input = document.getElementById('chat-input');
+  const msg = text || input.value.trim();
+  if (!msg || isGenerating) return;
 
-        try {
-          const systemPrompt = `You are an expert web developer. Generate a complete, single-file HTML website based on the user's description.
+  input.value = '';
+  autoResizeInput();
+  addMessage('user', msg);
+  conversationHistory.push({ role: 'user', content: msg });
+  await generate(msg);
+}
 
-RULES:
-- Return ONLY raw HTML code. No markdown, no backticks, no explanation — just the HTML document starting with <!DOCTYPE html>.
-- The website must be beautiful, modern, and production-quality.
-- Use embedded CSS (in <style> tags) and JS (in <script> tags) — no external dependencies except Google Fonts.
-- Choose creative fonts from Google Fonts that match the aesthetic.
-- Use a distinctive design with strong visual identity — not generic.
-- Make it fully responsive.
-- Include realistic placeholder content relevant to the prompt.
-- The design should feel handcrafted, not template-like.`;
+function quickSend(text) {
+  sendMessage(text);
+}
 
-          const response = await fetch('https://api.anthropic.com/v1/messages', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              model: 'claude-sonnet-4-20250514',
-              max_tokens: 4096,
-              system: systemPrompt,
-              messages: [{ role: 'user', content: `Build a website: ${prompt}` }]
-            })
-          });
+async function generate(prompt) {
+  isGenerating = true;
+  setGenerating(true, prompt);
+  addTypingIndicator();
 
-          const data = await response.json();
-          const html = data.content.map(b => b.text || '').join('').trim();
-
-          // Strip accidental markdown fences
-          generatedCode = html.replace(/^```html\n?/, '').replace(/\n?```$/, '').trim();
-
-          // Render in iframe
-          const iframe = document.getElementById('web-preview');
-          iframe.srcdoc = generatedCode;
-
-          // Show code preview
-          document.getElementById('code-display').textContent = generatedCode;
-          document.getElementById('code-size').textContent = `${(generatedCode.length / 1024).toFixed(1)} KB`;
-
-          document.getElementById('loading').classList.add('hidden');
-          document.getElementById('web-result').classList.remove('hidden');
-          document.getElementById('copy-btn').style.display = 'flex';
-          document.getElementById('toggle-code-btn').style.display = 'flex';
-
-        } catch (err) {
-          document.getElementById('loading').classList.add('hidden');
-          document.getElementById('web-result').classList.remove('hidden');
-          const iframe = document.getElementById('web-preview');
-          iframe.srcdoc = `<html><body style="font-family:monospace;padding:2rem;background:#0a0a0a;color:#ff4d6d">
-            <h2>Generation Error</h2><p>${err.message}</p>
-            <p style="color:#888;margin-top:1rem">Check console for details.</p>
-          </body></html>`;
-          console.error('Claude API error:', err);
-        }
-      }
-
-      document.getElementById('send-btn').disabled = false;
-    }
-
-    function regenerate() {
-      generate();
-    }
-
-    function copyCode() {
-      if (!generatedCode) return;
-      navigator.clipboard.writeText(generatedCode).then(() => {
-        const btn = document.getElementById('copy-btn');
-        btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-        setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy"></i> Copy Code'; }, 2000);
-      });
-    }
-
-    function toggleCode() {
-      const body = document.getElementById('code-display');
-      const btn = document.getElementById('toggle-code-btn');
-      const isVisible = body.style.display === 'block';
-      body.style.display = isVisible ? 'none' : 'block';
-      btn.innerHTML = isVisible
-        ? '<i class="fas fa-code"></i> View Code'
-        : '<i class="fas fa-eye-slash"></i> Hide Code';
-    }
-
-    // Enter key
-    document.getElementById('prompt').addEventListener('keydown', e => {
-      if (e.key === 'Enter') generate();
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 8000,
+        system: K2_SYSTEM,
+        messages: conversationHistory
+      })
     });
 
-    // Init
-    renderChips();
-  </script>
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+
+    const rawText = data.content.map(b => b.text || '').join('').trim();
+
+    // Split description from HTML
+    const htmlStart = rawText.indexOf('<!DOCTYPE') !== -1
+      ? rawText.indexOf('<!DOCTYPE')
+      : rawText.indexOf('<html');
+
+    let description = 'Done! Here\'s your website.';
+    let html = rawText;
+
+    if (htmlStart > 0) {
+      description = rawText.slice(0, htmlStart).trim().replace(/```html?/gi, '').trim();
+      html = rawText.slice(htmlStart);
+    }
+
+    // Strip any trailing markdown
+    html = html.replace(/```\s*$/, '').trim();
+
+    removeTypingIndicator();
+    addMessage('k2', description || 'Your website is ready ✓');
+
+    conversationHistory.push({ role: 'assistant', content: rawText });
+
+    currentCode = html;
+    renderPreview(html, prompt);
+
+  } catch (err) {
+    removeTypingIndicator();
+    addMessage('k2', `Error: ${err.message}. Please try again.`);
+    console.error(err);
+  }
+
+  isGenerating = false;
+  setGenerating(false);
+}
+
+function renderPreview(html, prompt) {
+  const iframe = document.getElementById('web-iframe');
+  const placeholder = document.getElementById('placeholder');
+
+  iframe.srcdoc = html;
+  iframe.style.display = 'block';
+  placeholder.style.display = 'none';
+
+  // Update URL bar
+  const slug = prompt.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40);
+  document.getElementById('url-bar').textContent = `k2://preview/${slug}`;
+
+  // Update code
+  document.getElementById('code-pre').textContent = html;
+
+  // Show action buttons
+  document.getElementById('toggle-code-btn').style.display = 'flex';
+  document.getElementById('copy-btn').style.display = 'flex';
+  document.getElementById('download-btn').style.display = 'flex';
+}
+
+// ── UI HELPERS ──
+function addMessage(role, text) {
+  const history = document.getElementById('chat-history');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  div.innerHTML = `
+    <div class="msg-sender">${role === 'user' ? 'You' : 'K2'}</div>
+    <div class="msg-bubble">${escapeAndFormat(text)}</div>
+  `;
+  history.appendChild(div);
+  history.scrollTop = history.scrollHeight;
+}
+
+function escapeAndFormat(text) {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\n/g, '<br>');
+}
+
+function addTypingIndicator() {
+  const history = document.getElementById('chat-history');
+  const div = document.createElement('div');
+  div.className = 'msg k2';
+  div.id = 'typing-indicator';
+  div.innerHTML = `
+    <div class="msg-sender">K2</div>
+    <div class="msg-bubble">
+      <div class="typing-indicator">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    </div>
+  `;
+  history.appendChild(div);
+  history.scrollTop = history.scrollHeight;
+}
+
+function removeTypingIndicator() {
+  const el = document.getElementById('typing-indicator');
+  if (el) el.remove();
+}
+
+function setGenerating(active, prompt = '') {
+  const overlay = document.getElementById('gen-overlay');
+  const sendBtn = document.getElementById('send-btn');
+  const input = document.getElementById('chat-input');
+
+  overlay.classList.toggle('active', active);
+  sendBtn.disabled = active;
+  input.disabled = active;
+
+  if (active && prompt) {
+    document.getElementById('gen-sub').textContent = `"${prompt.slice(0, 60)}${prompt.length > 60 ? '...' : ''}"`;
+  }
+}
+
+// ── ACTIONS ──
+function toggleCodeDrawer() {
+  const drawer = document.getElementById('code-drawer');
+  codeDrawerOpen = !codeDrawerOpen;
+  drawer.classList.toggle('open', codeDrawerOpen);
+  const btn = document.getElementById('toggle-code-btn');
+  btn.innerHTML = codeDrawerOpen
+    ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Hide`
+    : `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Code`;
+}
+
+function copyCode() {
+  if (!currentCode) return;
+  navigator.clipboard.writeText(currentCode).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Copied!`;
+    setTimeout(() => {
+      btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy`;
+    }, 2000);
+  });
+}
+
+function downloadHTML() {
+  if (!currentCode) return;
+  const blob = new Blob([currentCode], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'k2-website.html';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function reloadPreview() {
+  if (!currentCode) return;
+  const iframe = document.getElementById('web-iframe');
+  iframe.srcdoc = currentCode;
+}
+
+function clearChat() {
+  conversationHistory = [];
+  currentCode = '';
+  document.getElementById('chat-history').innerHTML = `
+    <div class="welcome-banner">
+      <h2>👋 I'm K2 — your website AI</h2>
+      <p>Describe anything. I'll build it live — landing pages, portfolios, dashboards, e-commerce, apps, components, animations, and more. Iterate freely.</p>
+      <div class="caps-list">
+        <span class="cap">Landing Pages</span>
+        <span class="cap">Portfolios</span>
+        <span class="cap">Dashboards</span>
+        <span class="cap">E-commerce</span>
+        <span class="cap">Animations</span>
+        <span class="cap">Components</span>
+        <span class="cap">Full Apps</span>
+      </div>
+    </div>`;
+  document.getElementById('web-iframe').style.display = 'none';
+  document.getElementById('web-iframe').srcdoc = '';
+  document.getElementById('placeholder').style.display = 'flex';
+  document.getElementById('url-bar').textContent = 'k2://preview — waiting for generation';
+  document.getElementById('toggle-code-btn').style.display = 'none';
+  document.getElementById('copy-btn').style.display = 'none';
+  document.getElementById('download-btn').style.display = 'none';
+  if (codeDrawerOpen) toggleCodeDrawer();
+}
+
+// ── INPUT AUTO-RESIZE ──
+function autoResizeInput() {
+  const el = document.getElementById('chat-input');
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('chat-input');
+  input.addEventListener('input', autoResizeInput);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+});
+</script>
 </body>
 </html>
